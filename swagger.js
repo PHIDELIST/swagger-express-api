@@ -1,4 +1,3 @@
-// swagger.js
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
@@ -10,8 +9,22 @@ const options = {
       version: '1.0.0',
       description: 'A simple Express API with Swagger documentation',
     },
+    components: {
+      securitySchemes: {
+        jwt: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        jwt: [],
+      },
+    ],
   },
-  apis: ['./routes/users.js'], 
+  apis: ['./routes/*.js'], 
 };
 
 const specs = swaggerJsdoc(options);

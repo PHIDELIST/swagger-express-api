@@ -4,7 +4,7 @@ const sequelize = require('./util/database');
 const User = require('./models/user');
 const { specs, swaggerUi } = require('./swagger');
 const app = express();
-
+require('dotenv').config();
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 
@@ -16,15 +16,16 @@ app.use((req, res, next) => {
 
 //integrate swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-//test route
+
 app.get('/', (req, res, next) => {
   res.send('Hello World');
 });
 
-//routes
+app.use('/auth', require('./routes/auth'));
+
 app.use('/users', require('./routes/users'));
 
-//error handling
+
 app.use((error, req, res, next) => {
   console.log(error);
   const status = error.statusCode || 500;

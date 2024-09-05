@@ -1,12 +1,7 @@
+const express = require('express');
 const controller = require('../controllers/users');
-const router = require('express').Router();
-
-/**
- * @swagger
- * tags:
- *   name: Users
- *   description: User management API
- */
+const authenticateJWT = require('../middlewares/auth');
+const router = express.Router();
 
 /**
  * @swagger
@@ -14,48 +9,87 @@ const router = require('express').Router();
  *   get:
  *     summary: Get all users
  *     tags: [Users]
+ *     security:
+ *       - jwt: []   
  *     responses:
  *       200:
- *         description: A list of users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
+ *         description: List of all users
+ *       403:
+ *         description: Invalid token
  */
-router.get('/', controller.getUsers); 
+router.get('/', authenticateJWT, controller.getUsers);
 
 /**
  * @swagger
  * /users/{userId}:
  *   get:
- *     summary: Get a user by ID
+ *     summary: Get a single user by ID
  *     tags: [Users]
+ *     security:
+ *       - jwt: []   
  *     parameters:
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: The user ID
  *     responses:
  *       200:
- *         description: The user description by ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
+ *         description: User found
  *       404:
  *         description: User not found
  */
-router.get('/:userId', controller.getUser); 
+router.get('/:userId', authenticateJWT, controller.getUser);
+
 /**
  * @swagger
  * /users:
  *   post:
  *     summary: Create a new user
  *     tags: [Users]
+ *     security:
+ *       - jwt: []  
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Bad request
+ */
+router.post('/', authenticateJWT, controller.createUser);
+
+/**
+ * @swagger
+ * /users/{userId}:
+ *   put:
+ *     summary: Update a user by ID
+ *     tags: [Users]
+ *     security:
+ *       - jwt: []  
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
@@ -71,42 +105,12 @@ router.get('/:userId', controller.getUser);
  *               email:
  *                 type: string
  *     responses:
- *       201:
- *         description: The created user
- */
-router.post('/', controller.createUser); 
-
-/**
- * @swagger
- * /users/{userId}:
- *   put:
- *     summary: Update a user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *     responses:
  *       200:
- *         description: The updated user
+ *         description: User updated successfully
  *       404:
  *         description: User not found
  */
-router.put('/:userId', controller.updateUser); 
+router.put('/:userId', authenticateJWT, controller.updateUser);
 
 /**
  * @swagger
@@ -114,19 +118,21 @@ router.put('/:userId', controller.updateUser);
  *   delete:
  *     summary: Delete a user by ID
  *     tags: [Users]
+ *     security:
+ *       - jwt: []   
  *     parameters:
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: The user ID
  *     responses:
  *       200:
- *         description: User deleted
+ *         description: User deleted successfully
  *       404:
  *         description: User not found
  */
-router.delete('/:userId', controller.deleteUser); 
+router.delete('/:userId', authenticateJWT, controller.deleteUser);
 
 module.exports = router;
